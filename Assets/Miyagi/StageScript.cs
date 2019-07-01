@@ -13,13 +13,16 @@ public class StageScript : MonoBehaviour
     Vector2[,] Bposition = new Vector2[Define.yarray, Define.xarray];
 
     int px, py;
-
+    int tmpx, tmpy;
 
     void Start()
     {
 
+
         px = 1;
         py = 0;
+        tmpx = 1;
+        tmpy = 0;
 
         player = Instantiate(player, new Vector2(-0.5f, 0), Quaternion.identity);
         for (int y = 0; y < Define.yarray; y++)
@@ -44,7 +47,10 @@ public class StageScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            Debug.Log(Barray[py, px]);
+        }
     }
 
     public void PlayerMove(string type)
@@ -54,6 +60,11 @@ public class StageScript : MonoBehaviour
             case "right":
                 if (px < Define.xarray - 1)
                 {
+                    px++;
+                    if (py > 3) py++;
+                    CheckBlock();
+                    if (py > 3) py--;
+                    px--;
                     Barray[py, px] = 6;
                     Barray[py, px + 1] = 5;
                     player.transform.position = Bposition[py, px + 1];
@@ -65,6 +76,11 @@ public class StageScript : MonoBehaviour
             case "left":
                 if (px > 0)
                 {
+                    px--;
+                    if (py > 3) py++;
+                    CheckBlock();
+                    if (py > 3) py--;
+                    px++;
                     Barray[py, px] = 6;
                     Barray[py, px - 1] = 5;
                     player.transform.position = Bposition[py, px - 1];
@@ -79,12 +95,17 @@ public class StageScript : MonoBehaviour
                     if (py < 3)
                     {
                         py++;
-                        Barray[py, px] = 6;
+                        CheckBlock();
+
+                        Barray[py-1, px] = 6;
                         Barray[py, px] = 5;
                         player.transform.position = Bposition[py, px];
                     }
                     else
                     {
+                        py++;
+                        CheckBlock();
+                        py--;
                         Barray[py, px] = 6;
                         Barray[py + 1, px] = 5;
                         for (int y = 0; y < Define.yarray; y++)
@@ -124,4 +145,71 @@ public class StageScript : MonoBehaviour
             }
         }
     }
+
+    private void CheckBlock()
+    {
+        if (py != 0 && Barray[py - 1, px] == Barray[py, px])
+        {
+            tmpy = py - 1; tmpx = px;
+            CheckBlock2();
+
+            Barray[py - 1, px] = 6;
+        }
+
+        if (Barray[py + 1, px] == Barray[py, px])
+        {
+            tmpy = py + 1; tmpx = px;
+            CheckBlock2();
+
+            Barray[py + 1, px] = 6;
+            Debug.Log("!!!");
+        }
+
+        if (px < Define.xarray -1 && Barray[py, px + 1] == Barray[py, px])
+        {
+            tmpy = py; tmpx = px + 1;
+            CheckBlock2();
+
+            Barray[py, px + 1] = 6;
+        }
+
+        if (px > 0 && Barray[py, px - 1] == Barray[py, px])
+        {
+            tmpy = py; tmpx = px - 1;
+            CheckBlock2();
+
+            Barray[py, px - 1] = 6;
+        }
+
+    }
+
+    private void CheckBlock2()
+    {
+        if (Barray[tmpy + 1, tmpx] == Barray[tmpy, tmpx])
+        {
+            
+            Barray[tmpy + 1, tmpx] = 6;
+        }
+
+        if (tmpy != 0 && Barray[tmpy - 1, tmpx] == Barray[tmpy, tmpx])
+        {
+            
+            Barray[tmpy - 1, tmpx] = 6;
+        }
+
+        if (tmpx < Define.xarray - 1 && Barray[tmpy, tmpx + 1] == Barray[tmpy, tmpx])
+        {
+            
+            Barray[tmpy, tmpx + 1] = 6;
+        }
+
+        if (tmpx > 0 && Barray[tmpy, tmpx - 1] == Barray[tmpy, tmpx])
+        {
+            
+            Barray[tmpy, tmpx - 1] = 6;
+        }
+        
+
+    }
+
 }
